@@ -15,8 +15,16 @@ class Database(object):
         """Create a new document."""
         pass
 
+    def get_document(self, id):
+        """Get the document."""
+        pass
+
     def find_documents(self, tag_ids):
-        """Find the documents which related to the given tags."""
+        """Find the documents which are related to the given tags."""
+        pass
+
+    def find_document_ids(self, tag_ids):
+        """Find the document identifiers which are related to the given tags."""
         pass
 
     def update_document(self, id, name=None, type=None, path=None):
@@ -27,12 +35,28 @@ class Database(object):
         """Remove the document"""
         pass
 
-    def create_tag(self, name):
+    def count_documents(self):
+        """Count the documents in the database."""
+        pass
+
+    def create_tag(self, id, name):
         """Create a new tag."""
         pass
 
+    def get_tag(self, id):
+        """Get the tag."""
+        pass
+
+    def find_tag_id(self, name):
+        """Find the tag identifier from the name."""
+        pass
+
     def find_tags(self, document_ids):
-        """Find tags which related to the given documents."""
+        """Find tags which are related to the given documents."""
+        pass
+
+    def find_tag_ids(self, document_ids):
+        """Find tag identifiers which are related to the given documents."""
         pass
 
     def update_tag(self, id, name):
@@ -43,10 +67,18 @@ class Database(object):
         """Remove the tag."""
         pass
 
+    def count_tags(self):
+        """Count the tags in the database."""
+        pass
+
     def create_relation(self, document_id, tag_id):
         """Create relation between the document and the tag."""
         pass
 
     def remove_relation(self, document_id, tag_id):
         """Remove the relation between the document and the tag."""
+        pass
+
+    def count_relations(self):
+        """Count the relations in the database."""
         pass
