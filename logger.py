@@ -10,7 +10,7 @@ class Logger(object):
         """Set the path of the log file."""
         self._path = path
 
-    def save_operation(self, **operation):
+    def save_operation(self, operation):
         """Save the operation to the log file."""
         pass
 
