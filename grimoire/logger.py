@@ -14,6 +14,6 @@ class Logger(object):
         """Save the operation to the log file."""
         pass
 
-    def restore_database(self, database):
-        """Restore the database contents from the log file."""
+    def restore_context(self, context):
+        """Restore the context from the log file."""
         pass

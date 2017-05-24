@@ -1,10 +1,10 @@
 """
-Simple in-memory database implementation for tagging
+Context of documents and tags
 """
 
 
-class Database(object):
-    """Database for tagging"""
+class Context(object):
+    """Represents an in-memory data structure for contexts"""
 
     def __init__(self):
         self._documents = {}
