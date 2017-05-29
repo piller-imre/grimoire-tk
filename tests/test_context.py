@@ -28,6 +28,12 @@ class ContextTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = context.get_document(2)
 
+    def test_invalid_document_creation(self):
+        context = Context()
+        context.create_document(1, 'first.txt', 'txt', '/tmp/first.txt')
+        with self.assertRaises(ValueError):
+            context.create_document(1, 'second.txt', 'txt', '/tmp/second.txt')
+
     def test_find_all_documents_from_empty_database(self):
         context = Context()
         documents = context.find_documents([])
@@ -97,7 +103,7 @@ class ContextTest(unittest.TestCase):
     def test_remove_document(self):
         context = Context()
         context.create_document(1, 'first.txt', 'txt', '/tmp/first.txt')
-        context.remove_document(1)
+        context.destroy_document(1)
         with self.assertRaises(ValueError):
             _ = context.get_document(1)
 
@@ -105,12 +111,12 @@ class ContextTest(unittest.TestCase):
         context = Context()
         context.create_document(1, 'first.txt', 'txt', '/tmp/first.txt')
         with self.assertRaises(ValueError):
-            context.remove_document(2)
+            context.destroy_document(2)
 
     def test_reuse_document_identifier(self):
         context = Context()
         context.create_document(1, 'first.txt', 'txt', '/tmp/first.txt')
-        context.remove_document(1)
+        context.destroy_document(1)
         context.create_document(1, 'other.dat', 'data', '/tmp/other.dat')
         document = context.get_document(1)
         self.assertEqual(document.id, 1)
@@ -127,11 +133,11 @@ class ContextTest(unittest.TestCase):
         self.assertEqual(context.count_documents(), 2)
         context.create_document(3, 'other.dat', 'data', '/tmp/other.dat')
         self.assertEqual(context.count_documents(), 3)
-        context.remove_document(3)
+        context.destroy_document(3)
         self.assertEqual(context.count_documents(), 2)
-        context.remove_document(1)
+        context.destroy_document(1)
         self.assertEqual(context.count_documents(), 1)
-        context.remove_document(2)
+        context.destroy_document(2)
         self.assertEqual(context.count_documents(), 0)
 
     def test_tag_creation(self):
@@ -147,6 +153,12 @@ class ContextTest(unittest.TestCase):
         context.create_tag(1, 'python')
         with self.assertRaises(ValueError):
             _ = context.get_tag(2)
+
+    def test_invalid_tag_creation(self):
+        context = Context()
+        context.create_tag(1, 'python')
+        with self.assertRaises(ValueError):
+            context.create_tag(1, 'rust')
 
     def test_find_all_tags_from_empty_database(self):
         context = Context()
@@ -181,7 +193,7 @@ class ContextTest(unittest.TestCase):
     def test_remove_tag(self):
         context = Context()
         context.create_tag(1, 'python')
-        context.remove_tag(1)
+        context.destroy_tag(1)
         with self.assertRaises(ValueError):
             _ = context.get_tag(1)
 
@@ -189,12 +201,12 @@ class ContextTest(unittest.TestCase):
         context = Context()
         context.create_tag(1, 'python')
         with self.assertRaises(ValueError):
-            context.remove_tag(2)
+            context.destroy_tag(2)
 
     def test_reuse_tag_identifier(self):
         context = Context()
         context.create_tag(1, 'python')
-        context.remove_tag(1)
+        context.destroy_tag(1)
         context.create_tag(1, 'rust')
         tag = context.get_tag(1)
         self.assertEqual(tag.id, 1)
@@ -209,11 +221,11 @@ class ContextTest(unittest.TestCase):
         self.assertEqual(context.count_tags(), 2)
         context.create_tag(3, 'lua')
         self.assertEqual(context.count_tags(), 3)
-        context.remove_tag(2)
+        context.destroy_tag(2)
         self.assertEqual(context.count_tags(), 2)
-        context.remove_tag(3)
+        context.destroy_tag(3)
         self.assertEqual(context.count_tags(), 1)
-        context.remove_tag(1)
+        context.destroy_tag(1)
         self.assertEqual(context.count_tags(), 0)
 
     def test_unique_tag_name_on_creation(self):
@@ -283,11 +295,11 @@ class ContextTest(unittest.TestCase):
         context.create_relation(2, 1)
         context.create_relation(3, 1)
         self.assertEqual(context.count_relations(), 3)
-        context.remove_relation(2, 1)
+        context.destroy_relation(2, 1)
         self.assertEqual(context.count_relations(), 2)
-        context.remove_relation(1, 1)
+        context.destroy_relation(1, 1)
         self.assertEqual(context.count_relations(), 1)
-        context.remove_relation(3, 1)
+        context.destroy_relation(3, 1)
         self.assertEqual(context.count_relations(), 0)
 
     def test_remove_missing_relation(self):
@@ -295,7 +307,7 @@ class ContextTest(unittest.TestCase):
         context.create_tag(1, 'book')
         context.create_document(1, 'python.pdf', 'pdf', '/tmp/python.pdf')
         with self.assertRaises(ValueError):
-            context.remove_relation(1, 1)
+            context.destroy_relation(1, 1)
 
     def test_remove_relations_with_document(self):
         context = Context()
@@ -306,11 +318,11 @@ class ContextTest(unittest.TestCase):
         context.create_relation(1, 1)
         context.create_relation(2, 1)
         context.create_relation(3, 1)
-        context.remove_document(1)
+        context.destroy_document(1)
         self.assertEqual(context.count_relations(), 2)
-        context.remove_document(3)
+        context.destroy_document(3)
         self.assertEqual(context.count_relations(), 1)
-        context.remove_document(2)
+        context.destroy_document(2)
         self.assertEqual(context.count_relations(), 0)
 
     def test_remove_relations_with_tag(self):
@@ -322,7 +334,7 @@ class ContextTest(unittest.TestCase):
         context.create_relation(1, 1)
         context.create_relation(2, 1)
         context.create_relation(3, 1)
-        context.remove_tag(1)
+        context.destroy_tag(1)
         self.assertEqual(context.count_relations(), 0)
 
     def test_multiple_tags_and_documents(self):

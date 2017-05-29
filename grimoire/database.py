@@ -12,4 +12,4 @@ class Database(Context):
     def __init__(self, path='/tmp/grimoire.log'):
         super(Context, self).__init__()
         self._logger = Logger(path)
-        self._logger.restore_context(self)
+        self._context = self._logger.restore_context()

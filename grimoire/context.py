@@ -31,8 +31,8 @@ class Context(object):
         """Update the document."""
         pass
 
-    def remove_document(self, id):
-        """Remove the document"""
+    def destroy_document(self, id):
+        """Remove the document from the context."""
         pass
 
     def count_documents(self):
@@ -63,8 +63,8 @@ class Context(object):
         """Update the tag."""
         pass
 
-    def remove_tag(self, id):
-        """Remove the tag."""
+    def destroy_tag(self, id):
+        """Remove the tag from the context."""
         pass
 
     def count_tags(self):
@@ -75,7 +75,7 @@ class Context(object):
         """Create relation between the document and the tag."""
         pass
 
-    def remove_relation(self, document_id, tag_id):
+    def destroy_relation(self, document_id, tag_id):
         """Remove the relation between the document and the tag."""
         pass
 

@@ -20,3 +20,9 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(database.count_documents(), 0)
         self.assertEqual(database.count_tags(), 0)
         self.assertEqual(database.count_relations(), 0)
+
+    def test_document_id_creation(self):
+        pass
+
+    def test_tag_id_creation(self):
+        pass
