@@ -1,7 +1,6 @@
 import os
 import unittest
 
-from grimoire.context import Context
 from grimoire.logger import Logger
 
 TEST_LOG_PATH = '/tmp/grimoire_test.log'
@@ -18,8 +17,7 @@ class LoggerTest(unittest.TestCase):
 
     def test_empty_context(self):
         logger = Logger(path=TEST_LOG_PATH)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 0)
         self.assertEqual(context.count_tags(), 0)
         self.assertEqual(context.count_relations(), 0)
@@ -34,8 +32,7 @@ class LoggerTest(unittest.TestCase):
             'path': '/tmp/first.txt'
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 1)
         document = context.get_document(1)
         self.assertEqual(document.id, 1)
@@ -58,8 +55,7 @@ class LoggerTest(unittest.TestCase):
             'id': 1
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 0)
 
     def test_tag_creation(self):
@@ -70,8 +66,7 @@ class LoggerTest(unittest.TestCase):
             'name': 'python'
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_tags(), 1)
         tag = context.get_tag(123)
         self.assertEqual(tag.id, 123)
@@ -90,8 +85,7 @@ class LoggerTest(unittest.TestCase):
             'id': 123
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_tags(), 0)
 
     def test_relation_creation(self):
@@ -116,8 +110,7 @@ class LoggerTest(unittest.TestCase):
             'tag_id': 123
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 1)
         self.assertEqual(context.count_tags(), 1)
         self.assertEqual(context.count_relations(), 1)
@@ -152,8 +145,7 @@ class LoggerTest(unittest.TestCase):
             'tag_id': 123
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 1)
         self.assertEqual(context.count_tags(), 1)
         self.assertEqual(context.count_relations(), 0)
@@ -178,8 +170,7 @@ class LoggerTest(unittest.TestCase):
             'name': 'new.rst'
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 1)
         document = context.get_document(456)
         self.assertEqual(document.id, 456)
@@ -204,8 +195,7 @@ class LoggerTest(unittest.TestCase):
             'type': 'rst'
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_documents(), 1)
         document = context.get_document(456)
         self.assertEqual(document.id, 456)
@@ -227,8 +217,7 @@ class LoggerTest(unittest.TestCase):
             'name': 'lua'
         }
         logger.save_operation(operation)
-        context = Context()
-        logger.restore_context(context)
+        context = logger.restore_context()
         self.assertEqual(context.count_tags(), 1)
         tag = context.get_tag(123)
         self.assertEqual(tag.id, 123)
