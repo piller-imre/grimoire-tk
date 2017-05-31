@@ -22,7 +22,17 @@ class DatabaseTest(unittest.TestCase):
         self.assertEqual(database.count_relations(), 0)
 
     def test_document_id_creation(self):
-        pass
+        database = Database(path=TEST_LOG_PATH)
+        existing_ids = set()
+        for _ in range(1000):
+            document_id = database.generate_document_id()
+            self.assertNotIn(document_id, existing_ids)
+            existing_ids.add(document_id)
 
     def test_tag_id_creation(self):
-        pass
+        database = Database(path=TEST_LOG_PATH)
+        existing_ids = set()
+        for _ in range(1000):
+            tag_id = database.generate_tag_id()
+            self.assertNotIn(tag_id, existing_ids)
+            existing_ids.add(tag_id)
