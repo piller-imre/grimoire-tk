@@ -52,6 +52,7 @@ class Scope(object):
     def clone_document(self, document_id):
         """
         Creates an exact copy of the document.
+        It moves the clone to the current scope.
         :param document_id: the identifier of the cloneable document
         :return: a document object
         :raises ValueError: for invalid document identifier
@@ -85,6 +86,13 @@ class Scope(object):
         """
         pass
 
+    def get_selected_documents(self):
+        """
+        Get the selected documents of the scope.
+        :return: the list of document objects
+        """
+        pass
+
     def toggle_document_selection(self, document_id):
         """
         Toggle the selection state of the document.
@@ -97,6 +105,7 @@ class Scope(object):
     def select_document(self, document_id):
         """
         Add a document to the selection.
+        Do nothing when the document has already selected.
         :param document_id: the identifier of the selected document
         :return: None
         :raises ValueError: for invalid document identifier
@@ -106,6 +115,7 @@ class Scope(object):
     def deselect_document(self, document_id):
         """
         Remove the document from the given selection.
+        Do nothing when the document has not selected.
         :param document_id: the identifier of the selected document
         :return: None
         :raises ValueError: for invalid document identifier
