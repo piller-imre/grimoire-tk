@@ -51,7 +51,7 @@ class LoggerTest(unittest.TestCase):
         }
         logger.save_operation(operation)
         operation = {
-            'method': 'remove_document',
+            'method': 'destroy_document',
             'id': 1
         }
         logger.save_operation(operation)
@@ -81,7 +81,7 @@ class LoggerTest(unittest.TestCase):
         }
         logger.save_operation(operation)
         operation = {
-            'method': 'remove_tag',
+            'method': 'destroy_tag',
             'id': 123
         }
         logger.save_operation(operation)
@@ -140,7 +140,7 @@ class LoggerTest(unittest.TestCase):
         }
         logger.save_operation(operation)
         operation = {
-            'method': 'remove_relation',
+            'method': 'destroy_relation',
             'document_id': 456,
             'tag_id': 123
         }
