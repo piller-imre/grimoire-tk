@@ -5,8 +5,6 @@ Manage the log file
 import json
 import os.path
 
-from grimoire.context import Context
-
 
 class Logger(object):
     """Log file manager"""
@@ -25,12 +23,10 @@ class Logger(object):
             log_file.write(line)
             log_file.write('\n')
 
-    def restore_context(self):
+    def restore_context(self, context):
         """Restore the context from the log file."""
-        context = Context()
         with open(self._path, 'r') as log_file:
             for line in log_file:
                 operation = json.loads(line)
                 method = operation.pop("method")
                 getattr(context, method)(**operation)
-        return context

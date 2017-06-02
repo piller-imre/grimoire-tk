@@ -157,3 +157,25 @@ class Context(object):
     def count_relations(self):
         """Count the relations in the database."""
         return len(self._relations)
+
+    def calc_last_document_id(self):
+        """
+        Calculate the last document identifier of the managed context.
+        :return: a positive integer value
+        """
+        last_id = 0
+        for document_id in self._documents:
+            if document_id > last_id:
+                last_id = document_id
+        return last_id
+
+    def calc_last_tag_id(self):
+        """
+        Calculate the last tag identifier of the managed context.
+        :return: a positive integer value
+        """
+        last_id = 0
+        for tag_id in self._tags:
+            if tag_id > last_id:
+                last_id = tag_id
+        return last_id
