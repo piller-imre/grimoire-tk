@@ -92,7 +92,7 @@ class ContextTest(unittest.TestCase):
         self.assertEqual(document.id, 1)
         self.assertEqual(document.name, 'second.csv')
         self.assertEqual(document.type, 'csv')
-        self.assertEqual(document.path, '/tmp/second.txt')
+        self.assertEqual(document.path, '/tmp/second.csv')
 
     def test_update_missing_document(self):
         context = Context()
@@ -129,7 +129,7 @@ class ContextTest(unittest.TestCase):
         self.assertEqual(context.count_documents(), 0)
         context.create_document(1, 'first.txt', 'txt', '/tmp/first.txt')
         self.assertEqual(context.count_documents(), 1)
-        context.update_document(2, 'second.csv', 'csv', '/tmp/second.csv')
+        context.create_document(2, 'second.csv', 'csv', '/tmp/second.csv')
         self.assertEqual(context.count_documents(), 2)
         context.create_document(3, 'other.dat', 'data', '/tmp/other.dat')
         self.assertEqual(context.count_documents(), 3)
@@ -267,11 +267,11 @@ class ContextTest(unittest.TestCase):
         context.create_relation(1, 1)
         context.create_relation(2, 1)
         context.create_relation(3, 1)
-        document_ids = context.find_document_ids(1)
+        document_ids = context.find_document_ids([1])
         self.assertEqual(document_ids, [1, 2, 3])
-        self.assertEqual(context.find_tag_ids(1), [1])
-        self.assertEqual(context.find_tag_ids(2), [1])
-        self.assertEqual(context.find_tag_ids(3), [1])
+        self.assertEqual(context.find_tag_ids([1]), [1])
+        self.assertEqual(context.find_tag_ids([2]), [1])
+        self.assertEqual(context.find_tag_ids([3]), [1])
 
     def test_create_relation_with_invalid_document(self):
         context = Context()
