@@ -215,6 +215,20 @@ class Scope(object):
         """
         pass
 
+    def get_selection_tags(self):
+        """
+        Get the tags of the selected documents.
+        :return: the list of tag objects
+        """
+        pass
+
+    def get_selection_tag_ids(self):
+        """
+        Get the identifiers of the tags of the selected documents.
+        :return: the list of tag identifiers
+        """
+        pass
+
     def get_selection_only_tags(self):
         """
         Get the tags of the selected documents which are not in the concept.
