@@ -13,10 +13,8 @@ class Scope(object):
         :return: None
         """
         self._database = database
-        self._documents = []
-        self._tags = []
-        self._selected_document_ids = []
-        self._selected_tag_ids = []
+        self._concept_tag_ids = []
+        self._selection_document_ids = []
         self._ordering = None
 
     def create_document(self, name, type, path):
@@ -79,17 +77,45 @@ class Scope(object):
         """
         pass
 
-    def get_documents(self):
+    def get_concept_documents(self):
         """
-        Get the documents of the scope.
+        Get the documents of the concept.
         :return: the list of document objects
         """
         pass
 
-    def get_selected_documents(self):
+    def get_concept_document_ids(self):
+        """
+        Get the identifiers of the documents of the concept.
+        :return: the list of document identifiers
+        """
+        pass
+
+    def get_selection_documents(self):
         """
         Get the selected documents of the scope.
         :return: the list of document objects
+        """
+        pass
+
+    def get_selection_document_ids(self):
+        """
+        Get the identifiers of the selected documents of the scope.
+        :return: the list of document identifiers
+        """
+        pass
+
+    def get_concept_only_documents(self):
+        """
+        Get documents which are only in the concept and not in the selection.
+        :return: the list of document objects
+        """
+        pass
+
+    def get_concept_only_document_ids(self):
+        """
+        Get the identifiers of the documents which are only in the concept and not in the selection.
+        :return: the list of document identifiers
         """
         pass
 
@@ -125,14 +151,6 @@ class Scope(object):
     def deselect_all_documents(self):
         """
         Remove all documents selection.
-        :return: None
-        """
-        pass
-
-    def collect_documents(self):
-        """
-        Collect the documents according to the current tags.
-        It is necessary after any query modification.
         :return: None
         """
         pass
@@ -183,38 +201,38 @@ class Scope(object):
         """
         pass
 
-    def get_tags(self):
+    def get_concept_tags(self):
         """
-        Get the tags of the scope.
+        Get the concept tags of the scope.
         :return: the list of tag objects
         """
         pass
 
-    def get_query_tags(self):
+    def get_concept_tag_ids(self):
         """
-        Get the query tags of the scope.
+        Get the tag identifiers of the concept tags.
+        :return: the list of tag identifiers
+        """
+        pass
+
+    def get_selection_only_tags(self):
+        """
+        Get the tags of the selected documents which are not in the concept.
         :return: the list of tag objects
         """
         pass
 
-    def get_document_only_tags(self):
+    def get_selection_only_tag_ids(self):
         """
-        Get the tags of the selected documents which are not in the query.
-        :return: the list of tag objects
+        Get the identifiers of the tags of the selected documents which are not in the concept.
+        :return: the list of tag identifiers
         """
+        pass
 
-    def get_suggested_tags(self, input):
+    def get_suggested_tags(self, tag_name_input):
         """
         Calculate tag suggestions for efficient navigation.
-        :param input: the content of actual text input
+        :param tag_name_input: the content of actual text input
         :return: the list of tag names as strings
-        """
-        pass
-
-    def collect_tags(self):
-        """
-        Collect the tags according to the selected documents.
-        It is necessary after any document selection event.
-        :return: None
         """
         pass
