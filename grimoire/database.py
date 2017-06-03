@@ -40,15 +40,18 @@ class Database(Context):
         :return: None
         """
         arguments['method'] = 'create_document'
-        self._logger.save_operation(**arguments)
+        self._logger.save_operation(arguments)
 
     def create_document(self, **arguments):
         """
         Create a new document for the database.
-        :return: None
+        :return: the created document object
         """
-        super(Database, self).create_document(**arguments)
+        document_id = self.generate_document_id()
+        arguments['id'] = document_id
+        document = super(Database, self).create_document(**arguments)
         self.save_operation('create_document', **arguments)
+        return document
 
     def update_document(self, **arguments):
         """
@@ -71,8 +74,11 @@ class Database(Context):
         Create a new tag.
         :return: None
         """
-        super(Database, self).create_tag(**arguments)
+        tag_id = self.generate_tag_id()
+        arguments['id'] = tag_id
+        tag = super(Database, self).create_tag(**arguments)
         self.save_operation('create_tag', **arguments)
+        return tag
 
     def update_tag(self, **arguments):
         """

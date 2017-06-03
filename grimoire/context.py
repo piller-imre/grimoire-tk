@@ -20,6 +20,7 @@ class Context(object):
             raise ValueError('Invalid document identifier!')
         document = Document(id, name, type, path)
         self._documents[id] = document
+        return document
 
     def get_document(self, id):
         """Get the document."""
@@ -83,6 +84,7 @@ class Context(object):
                 raise ValueError('The tag name already exist!')
         tag = Tag(id, name)
         self._tags[id] = tag
+        return tag
 
     def get_tag(self, id):
         """Get the tag."""

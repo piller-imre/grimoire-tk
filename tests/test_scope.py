@@ -97,9 +97,11 @@ class ScopeTest(unittest.TestCase):
             self.assertEqual(concept_only_document.type, sample_documents[concept_only_document.id]['type'])
             self.assertEqual(concept_only_document.path, sample_documents[concept_only_document.id]['path'])
         selection_only_tag_ids = scope.get_selection_only_tag_ids()
-        self.assertEqual(selection_only_tag_ids, [])
+        self.assertEqual(set(selection_only_tag_ids), {1, 2, 3, 4, 5, 6})
         selection_only_tags = scope.get_selection_only_tags()
-        self.assertEqual(selection_only_tags, [])
+        for selection_only_tag in selection_only_tags:
+            self.assertIn(selection_only_tag.id, sample_tags)
+            self.assertEqual(selection_only_tag.name, sample_tags[selection_only_tag.id])
 
     def test_document_creation_without_tags(self):
         scope = Scope(database=self._database)
@@ -126,7 +128,7 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 4, 5, document.id})
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {1, 3, 4, 5, 6})
         scope.select_document(document.id)
-        self.assertEqual(scope.get_concept_document_ids(), {1, 4, 5, document.id})
+        self.assertEqual(set(scope.get_concept_document_ids()), {1, 4, 5, document.id})
         self.assertEqual(scope.get_concept_tag_ids(), [2])
         self.assertEqual(scope.get_selection_document_ids(), [document.id])
         self.assertEqual(scope.get_selection_tag_ids(), [2])
@@ -200,35 +202,35 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [7])
         self.assertEqual(set(scope.get_selection_tag_ids()), {3, 6})
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {{1, 2, 3, 4, 5, 6, 8}})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 8})
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {3, 6})
         scope.add_tag(3)
-        self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
-        self.assertEqual(scope.get_concept_tag_ids(), [])
+        self.assertEqual(set(scope.get_concept_document_ids()), {2, 7, 8})
+        self.assertEqual(scope.get_concept_tag_ids(), [3])
         self.assertEqual(scope.get_selection_document_ids(), [7])
         self.assertEqual(set(scope.get_selection_tag_ids()), {3, 6})
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {{1, 2, 3, 4, 5, 6, 8}})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {2, 8})
         self.assertEqual(scope.get_selection_only_tag_ids(), [6])
         scope.remove_tag(3)
         self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
         self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [7])
         self.assertEqual(set(scope.get_selection_tag_ids()), {3, 6})
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {{1, 2, 3, 4, 5, 6, 8}})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 8})
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {3, 6})
         scope.add_tag(6)
-        self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
+        self.assertEqual(set(scope.get_concept_document_ids()), {4, 7})
         self.assertEqual(scope.get_concept_tag_ids(), [6])
         self.assertEqual(scope.get_selection_document_ids(), [7])
         self.assertEqual(set(scope.get_selection_tag_ids()), {3, 6})
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {{1, 2, 3, 4, 5, 6, 8}})
+        self.assertEqual(scope.get_concept_only_document_ids(), [4])
         self.assertEqual(scope.get_selection_only_tag_ids(), [3])
         scope.remove_tag(6)
         self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
         self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [7])
         self.assertEqual(set(scope.get_selection_tag_ids()), {3, 6})
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {{1, 2, 3, 4, 5, 6, 8}})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 8})
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {3, 6})
 
     def test_document_copy_with_single_tag(self):
@@ -333,9 +335,9 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
         self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [2])
-        self.assertEqual(scope.get_selection_tag_ids(), {1, 3, 6})
+        self.assertEqual(scope.get_selection_tag_ids(), [6])
         self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 3, 4, 5, 6, 7, 8})
-        self.assertEqual(set(scope.get_selection_only_tag_ids()), {1, 3, 6})
+        self.assertEqual(scope.get_selection_only_tag_ids(), [6])
 
     def test_document_move_with_multiple_tags(self):
         scope = Scope(database=self._database)
@@ -412,7 +414,7 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [cloned_document.id])
         self.assertEqual(scope.get_selection_tag_ids(), [6])
-        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 3, 4, 5, 6, 7, 8})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
         self.assertEqual(scope.get_selection_only_tag_ids(), [6])
 
     def test_document_clone_with_multiple_tags(self):
@@ -457,11 +459,18 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {2, 3})
         scope.remove_tag(6)
         self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8, cloned_document.id})
-        self.assertEqual(set(scope.get_concept_tag_ids()), [])
+        self.assertEqual(scope.get_concept_tag_ids(), [])
         self.assertEqual(scope.get_selection_document_ids(), [cloned_document.id])
         self.assertEqual(set(scope.get_selection_tag_ids()), {2, 3, 6})
         self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8})
         self.assertEqual(set(scope.get_selection_only_tag_ids()), {2, 3, 6})
+        scope.deselect_document(cloned_document.id)
+        self.assertEqual(set(scope.get_concept_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8, cloned_document.id})
+        self.assertEqual(scope.get_concept_tag_ids(), [])
+        self.assertEqual(scope.get_selection_document_ids(), [])
+        self.assertEqual(set(scope.get_selection_tag_ids()), {1, 2, 3, 4, 5, 6})
+        self.assertEqual(set(scope.get_concept_only_document_ids()), {1, 2, 3, 4, 5, 6, 7, 8, cloned_document.id})
+        self.assertEqual(set(scope.get_selection_only_tag_ids()), {1, 2, 3, 4, 5, 6})
         document_counts = {
             1: 4,
             2: 3 + 1,
@@ -550,8 +559,8 @@ class ScopeTest(unittest.TestCase):
         scope = Scope(database=self._database)
         tag_selections = {
             (1, 2): [1, 5],
-            (1, 3): [2, 7, 8],
-            (1, 4): [2, 6],
+            (1, 3): [2],
+            (1, 4): [3],
             (1, 5): [5],
             (1, 6): [],
             (2, 5): [5],
@@ -665,8 +674,8 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual(scope.get_concept_tags(), [])
         tag = scope.create_tag('n+1')
         scope.add_tag(tag.id)
-        self.assertEqual(scope.get_concept_tags(), [tag.id])
-        self.assertEqual(scope.get_selection_only_tags(), [])
+        self.assertEqual(scope.get_concept_tag_ids(), [tag.id])
+        self.assertEqual(set(scope.get_selection_only_tag_ids()), {1, 2, 3, 4, 5, 6})
         self.assertEqual(scope.get_concept_documents(), [])
 
     def test_tag_creation_with_single_document(self):
@@ -674,16 +683,18 @@ class ScopeTest(unittest.TestCase):
         scope.select_document(4)
         tag = scope.create_tag('template')
         scope.add_tag(tag.id)
-        concept_tags = scope.get_concept_tags()
-        self.assertEqual(concept_tags, [])
-        selection_only_tags = scope.get_selection_only_tags()
-        self.assertEqual(len(selection_only_tags), 3)
+        self.assertEqual(scope.get_concept_document_ids(), [4])
+        self.assertEqual(scope.get_concept_tag_ids(), [tag.id])
+        self.assertEqual(scope.get_selection_document_ids(), [4])
+        self.assertEqual(set(scope.get_selection_tag_ids()), {2, 6, tag.id})
+        self.assertEqual(scope.get_concept_only_document_ids(), [])
+        self.assertEqual(set(scope.get_selection_only_tag_ids()), {2, 6})
         tag_names = {
             2: 'python',
             6: 'index',
             tag.id: 'template'
         }
-        for tag in selection_only_tags:
+        for tag in scope.get_selection_only_tags():
             self.assertEqual(tag.name, tag_names[tag.id])
 
     def test_tag_creation_with_multiple_documents(self):
@@ -692,12 +703,12 @@ class ScopeTest(unittest.TestCase):
             scope.select_document(document_id)
         tag = scope.create_tag('source')
         scope.add_tag(tag.id)
-        concept_tags = scope.get_concept_tags()
-        self.assertEqual(concept_tags, [])
-        document_only_tags = scope.get_selection_only_tags()
-        self.assertEqual(len(document_only_tags), 1)
-        self.assertEqual(document_only_tags[0].id, tag.id)
-        self.assertEqual(document_only_tags[0].name, tag.name)
+        self.assertEqual(set(scope.get_concept_document_ids()), {4, 6, 7, 8})
+        self.assertEqual(scope.get_concept_tag_ids(), [tag.id])
+        self.assertEqual(set(scope.get_selection_document_ids()), {4, 6, 7, 8})
+        self.assertEqual(scope.get_selection_tag_ids(), [tag.id])
+        self.assertEqual(scope.get_concept_only_document_ids(), [])
+        self.assertEqual(scope.get_selection_only_tag_ids(), [])
 
     def test_duplicated_tag_creation(self):
         scope = Scope(database=self._database)
@@ -835,4 +846,4 @@ class ScopeTest(unittest.TestCase):
         for tag_id in range(1, 7):
             scope.destroy_tag(tag_id)
             with self.assertRaises(ValueError):
-                scope.destroy_document(tag_id)
+                scope.destroy_tag(tag_id)

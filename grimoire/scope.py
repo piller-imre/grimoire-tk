@@ -25,7 +25,9 @@ class Scope(object):
         :param path: the path of the document file in the filesystem
         :return: the created document object
         """
-        pass
+        document = self._database.create_document(name=name, type=type, path=path)
+        self.copy_document(document.id)
+        return document
 
     def copy_document(self, document_id):
         """
@@ -35,7 +37,9 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        _ = self._database.get_document(document_id)
+        for tag_id in self._concept_tag_ids:
+            self._database.create_relation(document_id=document_id, tag_id=tag_id)
 
     def move_document(self, document_id):
         """
@@ -45,7 +49,13 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        _ = self._database.get_document(document_id)
+        old_tags = set(self._database.find_tag_ids([document_id]))
+        new_tags = set(self._concept_tag_ids)
+        for tag_id in old_tags - new_tags:
+            self._database.destroy_relation(document_id=document_id, tag_id=tag_id)
+        for tag_id in new_tags - old_tags:
+            self._database.create_relation(document_id=document_id, tag_id=tag_id)
 
     def clone_document(self, document_id):
         """
@@ -55,7 +65,10 @@ class Scope(object):
         :return: a document object
         :raises ValueError: for invalid document identifier
         """
-        pass
+        document = self._database.get_document(document_id)
+        cloned_document = self._database.create_document(name=document.name, type=document.type, path=document.path)
+        self.move_document(document_id=cloned_document.id)
+        return cloned_document
 
     def destroy_document(self, document_id):
         """
@@ -66,7 +79,8 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        _ = self._database.get_document(document_id)
+        self._database.destroy_document(id=document_id)
 
     def get_document(self, document_id):
         """
@@ -75,49 +89,50 @@ class Scope(object):
         :return: a document object with the given identifier
         :raises ValueError: for invalid document identifier
         """
-        pass
+        return self._database.get_document(document_id)
 
     def get_concept_documents(self):
         """
         Get the documents of the concept.
         :return: the list of document objects
         """
-        pass
+        return self._database.find_documents(self._concept_tag_ids)
 
     def get_concept_document_ids(self):
         """
         Get the identifiers of the documents of the concept.
         :return: the list of document identifiers
         """
-        pass
+        return self._database.find_document_ids(self._concept_tag_ids)
 
     def get_selection_documents(self):
         """
         Get the selected documents of the scope.
         :return: the list of document objects
         """
-        pass
+        return [self._database.get_document(document_id) for document_id in self._selection_document_ids]
 
     def get_selection_document_ids(self):
         """
         Get the identifiers of the selected documents of the scope.
         :return: the list of document identifiers
         """
-        pass
+        return self._selection_document_ids
 
     def get_concept_only_documents(self):
         """
         Get documents which are only in the concept and not in the selection.
         :return: the list of document objects
         """
-        pass
+        return [self._database.get_document(document_id) for document_id in self.get_concept_only_document_ids()]
 
     def get_concept_only_document_ids(self):
         """
         Get the identifiers of the documents which are only in the concept and not in the selection.
         :return: the list of document identifiers
         """
-        pass
+        concept_document_ids = self._database.find_document_ids(self._concept_tag_ids)
+        return [document_id for document_id in concept_document_ids if document_id not in self._selection_document_ids]
 
     def toggle_document_selection(self, document_id):
         """
@@ -126,7 +141,10 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        if document_id not in self._selection_document_ids:
+            self.select_document(document_id)
+        else:
+            self.deselect_document(document_id)
 
     def select_document(self, document_id):
         """
@@ -136,7 +154,11 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        _ = self._database.get_document(document_id)
+        if document_id not in self._selection_document_ids:
+            self._selection_document_ids.append(document_id)
+        else:
+            ValueError('The given document has already selected!')
 
     def deselect_document(self, document_id):
         """
@@ -146,14 +168,24 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid document identifier
         """
-        pass
+        if document_id in self._selection_document_ids:
+            self._selection_document_ids.remove(document_id)
+        else:
+            raise ValueError('Invalid document identifier!')
 
     def deselect_all_documents(self):
         """
         Remove all documents selection.
         :return: None
         """
-        pass
+        self._selection_document_ids = []
+
+    def has_document_selection(self):
+        """
+        Sign that there is at least one selected document or not.
+        :return: a logical value
+        """
+        return bool(self._selection_document_ids)
 
     def create_tag(self, name):
         """
@@ -162,7 +194,10 @@ class Scope(object):
         :return: the created tag object
         :raises ValueError: for existing tag name
         """
-        pass
+        tag = self._database.create_tag(name=name)
+        for document_id in self._selection_document_ids:
+            self._database.create_relation(document_id=document_id, tag_id=tag.id)
+        return tag
 
     def add_tag(self, tag_id):
         """
@@ -171,7 +206,18 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid tag identifier
         """
-        pass
+        _ = self._database.get_tag(tag_id)
+        if self.has_document_selection():
+            if tag_id in self.get_selection_only_tag_ids():
+                self._concept_tag_ids.append(tag_id)
+            else:
+                for document_id in self._selection_document_ids:
+                    self._database.create_relation(document_id=document_id, tag_id=tag_id)
+        else:
+            if tag_id not in self._concept_tag_ids:
+                self._concept_tag_ids.append(tag_id)
+            else:
+                raise ValueError('The tag has alreaded added to the concept!')
 
     def remove_tag(self, tag_id):
         """
@@ -180,7 +226,18 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid tag identifier
         """
-        pass
+        _ = self._database.get_tag(tag_id)
+        if self.has_document_selection():
+            if tag_id in self._concept_tag_ids:
+                self._concept_tag_ids.remove(tag_id)
+            else:
+                for document_id in self._selection_document_ids:
+                    self._database.destroy_relation(document_id=document_id, tag_id=tag_id)
+        else:
+            if tag_id in self._concept_tag_ids:
+                self._concept_tag_ids.remove(tag_id)
+            else:
+                raise ValueError('The tag identifier does not in the scope!')
 
     def destroy_tag(self, tag_id):
         """
@@ -190,7 +247,7 @@ class Scope(object):
         :return: None
         :raises ValueError: for invalid tag identifier
         """
-        pass
+        self._database.destroy_tag(id=tag_id)
 
     def get_tag(self, tag_id):
         """
@@ -199,49 +256,50 @@ class Scope(object):
         :return: a tag object with the given tag identifier
         :raises ValueError: for invalid tag identifier
         """
-        pass
+        return self._database.get_tag(tag_id)
 
     def get_concept_tags(self):
         """
         Get the concept tags of the scope.
         :return: the list of tag objects
         """
-        pass
+        return [self._database.get_tag(tag_id) for tag_id in self._concept_tag_ids]
 
     def get_concept_tag_ids(self):
         """
         Get the tag identifiers of the concept tags.
         :return: the list of tag identifiers
         """
-        pass
+        return self._concept_tag_ids
 
     def get_selection_tags(self):
         """
         Get the tags of the selected documents.
         :return: the list of tag objects
         """
-        pass
+        return [self._database.get_tag(tag_id) for tag_id in self.get_selection_tag_ids()]
 
     def get_selection_tag_ids(self):
         """
         Get the identifiers of the tags of the selected documents.
         :return: the list of tag identifiers
         """
-        pass
+        return self._database.find_tag_ids(self._selection_document_ids)
 
     def get_selection_only_tags(self):
         """
         Get the tags of the selected documents which are not in the concept.
         :return: the list of tag objects
         """
-        pass
+        return [self._database.get_tag(tag_id) for tag_id in self.get_selection_only_tag_ids()]
 
     def get_selection_only_tag_ids(self):
         """
         Get the identifiers of the tags of the selected documents which are not in the concept.
         :return: the list of tag identifiers
         """
-        pass
+        selection_tag_ids = self.get_selection_tag_ids()
+        return [tag_id for tag_id in selection_tag_ids if tag_id not in self._concept_tag_ids]
 
     def get_suggested_tags(self, tag_name_input):
         """
@@ -249,4 +307,4 @@ class Scope(object):
         :param tag_name_input: the content of actual text input
         :return: the list of tag names as strings
         """
-        pass
+        return [tag_name_input]
