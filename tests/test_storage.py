@@ -25,7 +25,7 @@ class StorageTest(unittest.TestCase):
 
     def test_missing_root_path(self):
         self.assertFalse(os.path.isdir(TEST_ROOT_PATH))
-        storage = Storage(path=TEST_ROOT_PATH)
+        _ = Storage(path=TEST_ROOT_PATH)
         self.assertTrue(os.path.isdir(TEST_ROOT_PATH))
 
     def test_collect_file_paths_from_empty_storage(self):
@@ -41,7 +41,7 @@ class StorageTest(unittest.TestCase):
             touch(absolute_path)
         storage = Storage(path=TEST_ROOT_PATH)
         result_paths = storage.collect_file_paths()
-        self.assertEqual(result_paths, paths)
+        self.assertEqual(set(result_paths), set(paths))
 
     def test_directory_structure(self):
         os.makedirs(TEST_ROOT_PATH)
@@ -57,7 +57,7 @@ class StorageTest(unittest.TestCase):
             touch(absolute_path)
         storage = Storage(path=TEST_ROOT_PATH)
         result_paths = storage.collect_file_paths()
-        self.assertEqual(result_paths, paths)
+        self.assertEqual(set(result_paths), set(paths))
 
     def test_empty_directory_skipping(self):
         os.makedirs(TEST_ROOT_PATH)
@@ -69,4 +69,4 @@ class StorageTest(unittest.TestCase):
             os.makedirs(TEST_ROOT_PATH + directory_name)
         storage = Storage(path=TEST_ROOT_PATH)
         result_paths = storage.collect_file_paths()
-        self.assertEqual(result_paths, paths)
+        self.assertEqual(set(result_paths), set(paths))
