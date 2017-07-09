@@ -13,6 +13,10 @@ class Storage(object):
             os.makedirs(path)
         self._path = path
 
+    @property
+    def path(self):
+        return self._path
+
     def collect_file_paths(self):
         """
         Collect the file paths from the storage directory recursively.

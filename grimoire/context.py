@@ -23,11 +23,18 @@ class Context(object):
         return document
 
     def get_document(self, id):
-        """Get the document."""
+        """Get the document by identifier."""
         try:
             return self._documents[id]
         except KeyError:
             raise ValueError('Invalid document identifier!')
+
+    def collect_document_paths(self):
+        """Get the paths of the documents."""
+        paths = set()
+        for _, document in self._documents.items():
+            paths.add(document.path)
+        return paths
 
     def find_documents(self, tag_ids):
         """Find the documents which are related to the given tags."""

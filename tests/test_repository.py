@@ -35,14 +35,14 @@ class RepositoryTest(unittest.TestCase):
         storage = Storage(TEST_ROOT_PATH)
         repository = Repository(database, storage)
         untracked_files = repository.collect_untracked_file_paths()
-        self.assertEqual(untracked_files, [])
+        self.assertEqual(len(untracked_files), 0)
         missing_files = repository.collect_missing_file_paths()
-        self.assertEqual(missing_files, [])
+        self.assertEqual(len(missing_files), 0)
 
     def test_untracked_files(self):
         database = Database(TEST_LOG_PATH)
         storage = Storage(TEST_ROOT_PATH)
-        paths = ['first.txt', 'second.txt', 'third.txt']
+        paths = {'first.txt', 'second.txt', 'third.txt'}
         for path in paths:
             absolute_path = TEST_ROOT_PATH + path
             touch(absolute_path)
@@ -98,9 +98,6 @@ class RepositoryTest(unittest.TestCase):
                 'path': 'second.png'
             }
         ]
-        database_paths = {
-            'first.txt', 'second.png', 'images/second.png'
-        }
         for document in documents:
             database.create_document(**document)
         storage = Storage(TEST_ROOT_PATH)
@@ -110,9 +107,9 @@ class RepositoryTest(unittest.TestCase):
             touch(absolute_path)
         repository = Repository(database, storage)
         untracked_files = repository.collect_untracked_file_paths()
-        self.assertEqual(untracked_files, {'second.png', 'images/second.png'})
+        self.assertEqual(untracked_files, {'second.txt', 'third.txt'})
         missing_files = repository.collect_missing_file_paths()
-        self.assertEqual(missing_files, {'second.txt', 'third.txt'})
+        self.assertEqual(missing_files, {'second.png', 'images/second.png'})
 
     def test_matching_database_and_storage(self):
         database = Database(TEST_LOG_PATH)
@@ -136,7 +133,7 @@ class RepositoryTest(unittest.TestCase):
         for document in documents:
             database.create_document(**document)
         storage = Storage(TEST_ROOT_PATH)
-        storage_paths = {'first.txt', 'images/second.txt', 'second.png'}
+        storage_paths = {'first.txt', 'images/second.png', 'second.png'}
         os.mkdir(TEST_ROOT_PATH + 'images')
         for path in storage_paths:
             absolute_path = TEST_ROOT_PATH + path
@@ -192,7 +189,7 @@ class RepositoryTest(unittest.TestCase):
         for document in documents:
             database.create_document(**document)
         storage = Storage(TEST_ROOT_PATH)
-        storage_paths = {'first.txt', 'images/second.txt', 'second.png'}
+        storage_paths = {'first.txt', 'images/second.png', 'second.png'}
         os.mkdir(TEST_ROOT_PATH + 'images')
         for path in storage_paths:
             absolute_path = TEST_ROOT_PATH + path
@@ -208,7 +205,7 @@ class RepositoryTest(unittest.TestCase):
         self.assertEqual(untracked_files, {'first.txt', 'second.png'})
         repository.untrack_document(2)
         untracked_files = repository.collect_untracked_file_paths()
-        self.assertEqual(untracked_files, {'first.txt', 'images/second.txt', 'second.png'})
+        self.assertEqual(untracked_files, {'first.txt', 'images/second.png', 'second.png'})
 
     def test_track_untrack_and_track_again(self):
         database = Database(TEST_LOG_PATH)
@@ -218,19 +215,19 @@ class RepositoryTest(unittest.TestCase):
             absolute_path = TEST_ROOT_PATH + path
             touch(absolute_path)
         repository = Repository(database, storage)
-        for i in range(1, 10, 2):
+        for _ in range(1, 10):
             untracked_files = repository.collect_untracked_file_paths()
             self.assertEqual(untracked_files, {'alpha.py', 'beta.py'})
-            repository.track_file('alpha.py')
+            alpha_id = repository.track_file('alpha.py')
             untracked_files = repository.collect_untracked_file_paths()
             self.assertEqual(untracked_files, {'beta.py'})
-            repository.track_file('beta.py')
+            beta_id = repository.track_file('beta.py')
             untracked_files = repository.collect_untracked_file_paths()
             self.assertEqual(untracked_files, set())
-            repository.untrack_document(i + 1)
+            repository.untrack_document(alpha_id)
             untracked_files = repository.collect_untracked_file_paths()
             self.assertEqual(untracked_files, {'alpha.py'})
-            repository.untrack_document(i + 2)
+            repository.untrack_document(beta_id)
 
     def test_invalid_track(self):
         database = Database(TEST_LOG_PATH)
@@ -244,4 +241,4 @@ class RepositoryTest(unittest.TestCase):
         storage = Storage(TEST_ROOT_PATH)
         repository = Repository(database, storage)
         with self.assertRaises(ValueError):
-            _ = repository.utrack_file(1234)
+            _ = repository.untrack_document(1234)
