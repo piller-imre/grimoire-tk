@@ -12,9 +12,13 @@ class Database(Context):
     def __init__(self, path='/tmp/grimoire.log'):
         super(Database, self).__init__()
         self._logger = Logger(path)
+        self._logger.disable_logging()
+        self._last_document_id = 0
+        self._last_tag_id = 0
         self._logger.restore_context(self)
         self._last_document_id = self.calc_last_document_id()
         self._last_tag_id = self.calc_last_tag_id()
+        self._logger.enable_logging()
 
     def generate_document_id(self):
         """
@@ -39,7 +43,7 @@ class Database(Context):
         :param arguments: arguments of the given method
         :return: None
         """
-        arguments['method'] = 'create_document'
+        arguments['method'] = method
         self._logger.save_operation(arguments)
 
     def create_document(self, **arguments):

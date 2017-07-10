@@ -217,7 +217,7 @@ class Scope(object):
             if tag_id not in self._concept_tag_ids:
                 self._concept_tag_ids.append(tag_id)
             else:
-                raise ValueError('The tag has alreaded added to the concept!')
+                raise ValueError('The tag has already added to the concept!')
 
     def remove_tag(self, tag_id):
         """

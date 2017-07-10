@@ -12,6 +12,7 @@ class Logger(object):
     def __init__(self, path):
         """Set the path of the log file."""
         self._path = path
+        self._need_write_to_log = True
         if os.path.isfile(path) is False:
             with open(path, 'a'):
                 pass
@@ -19,9 +20,10 @@ class Logger(object):
     def save_operation(self, operation):
         """Save the operation to the log file."""
         line = json.dumps(operation)
-        with open(self._path, 'a') as log_file:
-            log_file.write(line)
-            log_file.write('\n')
+        if self._need_write_to_log:
+            with open(self._path, 'a') as log_file:
+                log_file.write(line)
+                log_file.write('\n')
 
     def restore_context(self, context):
         """Restore the context from the log file."""
@@ -30,3 +32,11 @@ class Logger(object):
                 operation = json.loads(line)
                 method = operation.pop("method")
                 getattr(context, method)(**operation)
+
+    def disable_logging(self):
+        """Disable logging to the log file."""
+        self._need_write_to_log = False
+
+    def enable_logging(self):
+        """Enable loggint to the log file."""
+        self._need_write_to_log = True
