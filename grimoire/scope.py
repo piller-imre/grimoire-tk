@@ -258,6 +258,14 @@ class Scope(object):
         """
         return self._database.get_tag(tag_id)
 
+    def find_tag_id(self, tag_name):
+        """
+        Find the tag identifier from tag name.
+        :param tag_name: the name of the tag
+        :return: the tag identifier
+        """
+        return self._database.find_tag_id(tag_name)
+
     def get_concept_tags(self):
         """
         Get the concept tags of the scope.
