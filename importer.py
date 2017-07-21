@@ -20,9 +20,25 @@ scope = Scope(database)
 
 def list_untracked_files():
     untracked_file_paths = repository.collect_untracked_file_paths()
-    file_list.delete(0, tkinter.END)
+    file_view.delete(*file_view.get_children())
     for file_path in untracked_file_paths:
-        file_list.insert(tkinter.END, file_path)
+        file_view.insert('', tkinter.END, iid=file_path, text=file_path)
+
+
+def open_file(event):
+    file_path = file_view.identify_row(event.y)
+    print('Open {}'.format(file_path))
+
+
+def import_file(event):
+    file_path = file_view.identify_row(event.y)
+    repository.track_file(file_path)
+    list_untracked_files()
+    list_current_documents()
+
+
+def refresh_file_list(event):
+    list_untracked_files()
 
 
 def list_current_documents():
@@ -71,18 +87,6 @@ def list_current_tags():
 
 def tag_entry_callback(*args):
     list_current_tags()
-
-
-def file_list_refresh(event):
-    list_untracked_files()
-
-
-def import_selected_file():
-    selection = file_list.curselection()
-    file_path = file_list.get(selection[0])
-    repository.track_file(file_path)
-    list_untracked_files()
-    list_current_documents()
 
 
 def open_document(event):
@@ -202,9 +206,10 @@ document_view.bind('<Button-1>', select_single_document)
 document_view.bind('<Shift-Button-1>', select_document)
 document_view.bind('<Button-3>', open_document)
 
-file_import_button = tkinter.Button(root, text='Import', command=import_selected_file)
-file_list = tkinter.Listbox(root)
-file_list.bind("<Button-3>", file_list_refresh)
+file_view = ttk.Treeview(root, selectmode='none')
+file_view.bind('<Button-1>', open_file)
+file_view.bind('<Button-3>', import_file)
+file_view.bind('<Button-2>', refresh_file_list)
 
 full = (tkinter.N, tkinter.S, tkinter.E, tkinter.W)
 
@@ -213,14 +218,13 @@ ordering_combobox.grid(row=0, column=1, sticky=full)
 tag_view.grid(row=1, column=0, sticky=full)
 document_view.grid(row=1, column=1, sticky=full)
 
-file_import_button.grid(row=0, column=2, sticky=full)
-file_list.grid(row=1, column=2, sticky=full)
+file_view.grid(row=2, column=0, columnspan=2, sticky=full)
 
 root.rowconfigure(0, weight=0)
 root.rowconfigure(1, weight=1)
+root.rowconfigure(2, weight=0)
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=4)
-root.columnconfigure(2, weight=3)
 
 list_untracked_files()
 list_current_documents()
