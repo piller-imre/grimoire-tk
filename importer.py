@@ -2,6 +2,8 @@
 File importer graphical application
 """
 
+import os
+import subprocess
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
@@ -18,6 +20,25 @@ repository = Repository(database, storage)
 scope = Scope(database)
 
 
+def open_path(file_path):
+    absolute_path = os.path.join(storage.path, file_path)
+    if not os.path.isfile(absolute_path):
+        raise ValueError('Invalid file path! {}'.format(absolute_path))
+    extension = os.path.splitext(file_path)[1]
+    if len(extension) > 1:
+        t = extension[1:].lower()
+        if t == 'pdf':
+            _ = subprocess.Popen(['evince', absolute_path])
+        elif t in ['png', 'jpg', 'jpeg', 'bmp']:
+            _ = subprocess.Popen(['viewnior', absolute_path])
+        elif t in ['py', 'h', 'c', 'cpp', 'txt', 'html', 'js', 'css']:
+            _ = subprocess.Popen(['gedit', absolute_path])
+        elif t in ['doc', 'docx', 'ppt', 'pptx']:
+            _ = subprocess.Popen(['libreoffice', absolute_path])
+        elif t in ['dia']:
+            _ = subprocess.Popen(['dia', absolute_path])
+
+
 def list_untracked_files():
     untracked_file_paths = repository.collect_untracked_file_paths()
     file_view.delete(*file_view.get_children())
@@ -28,6 +49,7 @@ def list_untracked_files():
 def open_file(event):
     file_path = file_view.identify_row(event.y)
     print('Open {}'.format(file_path))
+    open_path(file_path)
 
 
 def import_file(event):
@@ -93,6 +115,8 @@ def open_document(event):
     iid = document_view.identify_row(event.y)
     document_id = int(iid)
     print('Open document {}'.format(document_id))
+    document = database.get_document(document_id)
+    open_path(document.path)
 
 
 def select_single_document(event):
@@ -207,9 +231,9 @@ document_view.bind('<Shift-Button-1>', select_document)
 document_view.bind('<Button-3>', open_document)
 
 file_view = ttk.Treeview(root, selectmode='none')
-file_view.bind('<Button-1>', open_file)
-file_view.bind('<Button-3>', import_file)
-file_view.bind('<Button-2>', refresh_file_list)
+file_view.bind('<Button-1>', refresh_file_list)
+file_view.bind('<Button-2>', import_file)
+file_view.bind('<Button-3>', open_file)
 
 full = (tkinter.N, tkinter.S, tkinter.E, tkinter.W)
 
