@@ -2,8 +2,10 @@
 File importer graphical application
 """
 
+from datetime import datetime
 import os
 import subprocess
+
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
@@ -37,6 +39,11 @@ def open_path(file_path):
             _ = subprocess.Popen(['libreoffice', absolute_path])
         elif t in ['dia']:
             _ = subprocess.Popen(['dia', absolute_path])
+        elif t in ['url', 'yt', 'github', 'fb', 'wiki']:
+            with open(absolute_path, 'r') as url_file:
+                lines = url_file.readlines()
+                url = lines[0].strip()
+            _ = subprocess.Popen(['firefox', url])
 
 
 def list_untracked_files():
@@ -113,27 +120,36 @@ def tag_entry_callback(*args):
 
 def open_document(event):
     iid = document_view.identify_row(event.y)
-    document_id = int(iid)
-    print('Open document {}'.format(document_id))
-    document = database.get_document(document_id)
-    open_path(document.path)
+    try:
+        document_id = int(iid)
+        print('Open document {}'.format(document_id))
+        document = database.get_document(document_id)
+        open_path(document.path)
+    except ValueError:
+        pass
 
 
 def select_single_document(event):
     iid = document_view.identify_row(event.y)
-    document_id = int(iid)
-    scope.deselect_all_documents()
-    scope.toggle_document_selection(document_id)
-    list_current_documents()
-    list_current_tags()
+    try:
+        document_id = int(iid)
+        scope.deselect_all_documents()
+        scope.toggle_document_selection(document_id)
+        list_current_documents()
+        list_current_tags()
+    except ValueError:
+        pass
 
 
 def select_document(event):
     iid = document_view.identify_row(event.y)
-    document_id = int(iid)
-    scope.toggle_document_selection(document_id)
-    list_current_documents()
-    list_current_tags()
+    try:
+        document_id = int(iid)
+        scope.toggle_document_selection(document_id)
+        list_current_documents()
+        list_current_tags()
+    except ValueError:
+        pass
 
 
 def add_tag_to_query(tag_id):
@@ -217,6 +233,60 @@ def show_note_dialog():
     root.wait_window(note_dialog.top)
 
 
+class Note(object):
+    """Represents a note"""
+
+    def __init__(self, type, url, comment):
+        self._type = type
+        self._url = url
+        self._comment = comment
+        self._extension = self.calc_extension()
+        self._name = self.calc_name()
+
+    def calc_extension(self):
+        """Calculate the extension of the note."""
+        extensions = {
+            'URL': 'url',
+            'YouTube': 'yt',
+            'GitHub': 'github',
+            'FaceBook': 'fb',
+            'Wikipedia': 'wiki'
+        }
+        try:
+            extension = extensions[self._type]
+        except KeyError:
+            extension = 'url'
+        return extension
+
+    def calc_name(self):
+        """Calculate the name of the note from the type and date."""
+        timestamp = datetime.now().strftime('%y%m%d_%H%M%S')
+        name = 'note_{}.{}'.format(timestamp, self._extension)
+        return name
+
+    def save(self):
+        """Save the note."""
+        self.save_to_storage()
+        self.save_to_scope()
+        list_current_documents()
+
+    def save_to_storage(self):
+        """Save the note to the storage."""
+        path = os.path.join(storage.path, 'notes', self._name)
+        with open(path, 'w') as note_file:
+            note_file.write(self._url)
+            note_file.write('\n')
+            if self._comment != '':
+                note_file.write('# ')
+                note_file.write(self._comment)
+                note_file.write('\n')
+
+    def save_to_scope(self):
+        """Save the note to the current scope."""
+        path = os.path.join('notes', self._name)
+        scope.create_document(self._name, self._extension, path)
+
+
 class NoteDialog(object):
     """Dialog for adding new note"""
 
@@ -229,7 +299,7 @@ class NoteDialog(object):
         dialog_frame = tkinter.Frame(top)
 
         self.type_combobox = ttk.Combobox(dialog_frame)
-        self.type_combobox['values'] = ['URL', 'YouTube', 'GitHub', 'FaceBook']
+        self.type_combobox['values'] = ['URL', 'Wikipedia', 'YouTube', 'GitHub', 'FaceBook']
         self.type_combobox.current(1)
         self.url_entry = tkinter.Entry(dialog_frame)
         self.comment_entry = tkinter.Entry(dialog_frame)
@@ -257,10 +327,11 @@ class NoteDialog(object):
         dialog_frame.columnconfigure(1, weight=1)
 
     def save_note(self):
-        print('Save the note ...')
-        print(self.type_combobox.get())
-        print(self.url_entry.get())
-        print(self.comment_entry.get())
+        type = self.type_combobox.get()
+        url = self.url_entry.get()
+        comment = self.comment_entry.get()
+        note = Note(type, url, comment)
+        note.save()
         self.close_note_dialog()
 
     def close_note_dialog(self):
