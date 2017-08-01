@@ -211,13 +211,69 @@ def right_click_on_tag(event):
                 tag_entry.delete(0, tkinter.END)
 
 
+def show_note_dialog():
+    print('Show the note dialog!')
+    note_dialog = NoteDialog(root)
+    root.wait_window(note_dialog.top)
+
+
+class NoteDialog(object):
+    """Dialog for adding new note"""
+
+    def __init__(self, parent):
+        top = self.top = tkinter.Toplevel(parent)
+
+        top.title('Create new note')
+        top.geometry('700x100')
+
+        dialog_frame = tkinter.Frame(top)
+
+        self.type_combobox = ttk.Combobox(dialog_frame)
+        self.type_combobox['values'] = ['URL', 'YouTube', 'GitHub', 'FaceBook']
+        self.type_combobox.current(1)
+        self.url_entry = tkinter.Entry(dialog_frame)
+        self.comment_entry = tkinter.Entry(dialog_frame)
+        self.save_button = tkinter.Button(dialog_frame, text='Save', command=self.save_note)
+        self.cancel_button = tkinter.Button(dialog_frame, text='Cancel', command=self.close_note_dialog)
+
+        full = (tkinter.N, tkinter.S, tkinter.E, tkinter.W)
+
+        dialog_frame.grid(row=0, column=0, sticky=full)
+
+        self.type_combobox.grid(row=0, column=0, columnspan=2, sticky=full)
+        self.url_entry.grid(row=1, column=0, columnspan=2, sticky=full)
+        self.comment_entry.grid(row=2, column=0, columnspan=2, sticky=full)
+        self.save_button.grid(row=3, column=1, sticky=full)
+        self.cancel_button.grid(row=3, column=0, sticky=full)
+
+        top.rowconfigure(0, weight=1)
+        top.columnconfigure(0, weight=1)
+
+        dialog_frame.rowconfigure(0, weight=1)
+        dialog_frame.rowconfigure(1, weight=1)
+        dialog_frame.rowconfigure(2, weight=1)
+        dialog_frame.rowconfigure(3, weight=1)
+        dialog_frame.columnconfigure(0, weight=1)
+        dialog_frame.columnconfigure(1, weight=1)
+
+    def save_note(self):
+        print('Save the note ...')
+        print(self.type_combobox.get())
+        print(self.url_entry.get())
+        print(self.comment_entry.get())
+        self.close_note_dialog()
+
+    def close_note_dialog(self):
+        self.top.focus_set()
+        self.top.destroy()
+
+
 root = tkinter.Tk()
 root.title('Grimoire - Importer')
 
 tag_entry_value = StringVar()
 tag_entry = tkinter.Entry(root, textvariable=tag_entry_value)
 tag_entry_value.trace('w', tag_entry_callback)
-ordering_combobox = ttk.Combobox(root)
 
 tag_view = ttk.Treeview(root, selectmode='none')
 tag_view.bind('<Button-1>', left_click_on_tag)
@@ -235,10 +291,18 @@ file_view.bind('<Button-1>', refresh_file_list)
 file_view.bind('<Button-2>', import_file)
 file_view.bind('<Button-3>', open_file)
 
+toolbar = tkinter.Frame(root)
+
+ordering_combobox = ttk.Combobox(toolbar)
+note_button = tkinter.Button(toolbar, text='Note', command=show_note_dialog)
+
 full = (tkinter.N, tkinter.S, tkinter.E, tkinter.W)
 
-tag_entry.grid(row=0, column=0, sticky=full)
+note_button.grid(row=0, column=0, sticky=full)
 ordering_combobox.grid(row=0, column=1, sticky=full)
+
+tag_entry.grid(row=0, column=0, sticky=full)
+toolbar.grid(row=0, column=1, sticky=full)
 tag_view.grid(row=1, column=0, sticky=full)
 document_view.grid(row=1, column=1, sticky=full)
 
