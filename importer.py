@@ -61,7 +61,8 @@ def open_file(event):
 
 def import_file(event):
     file_path = file_view.identify_row(event.y)
-    repository.track_file(file_path)
+    document_id = repository.track_file(file_path)
+    scope.copy_document(document_id)
     list_untracked_files()
     list_current_documents()
 
