@@ -17,10 +17,17 @@ from grimoire.scope import Scope
 from grimoire.storage import Storage
 
 
-database = Database('/tmp/importer/grimoire.log')
-storage = Storage('/tmp/importer/storage/')
+DATABASE_PATH = '/tmp/importer/grimoire.log'
+STORAGE_PATH = '/tmp/importer/storage/'
+NOTES_PATH = '/tmp/importer/storage/notes/'
+
+database = Database(DATABASE_PATH)
+storage = Storage(STORAGE_PATH)
 repository = Repository(database, storage)
 scope = Scope(database)
+
+if os.path.isdir(NOTES_PATH) is False:
+    os.mkdir(NOTES_PATH)
 
 
 def open_path(file_path):
@@ -34,7 +41,7 @@ def open_path(file_path):
             _ = subprocess.Popen(['evince', absolute_path])
         elif t in ['png', 'jpg', 'jpeg', 'bmp']:
             _ = subprocess.Popen(['viewnior', absolute_path])
-        elif t in ['py', 'h', 'c', 'cpp', 'txt', 'html', 'js', 'css', 'rst', 'md']:
+        elif t in ['py', 'h', 'c', 'cpp', 'txt', 'html', 'js', 'css', 'rst', 'md', 'mail', 'log']:
             _ = subprocess.Popen(['gedit', absolute_path])
         elif t in ['doc', 'docx', 'ppt', 'pptx']:
             _ = subprocess.Popen(['libreoffice', absolute_path])
