@@ -9,6 +9,7 @@ import subprocess
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
+from tkinter import messagebox
 
 from grimoire.database import Database
 from grimoire.repository import Repository
@@ -229,9 +230,11 @@ def right_click_on_tag(event):
 
 
 def show_note_dialog():
-    print('Show the note dialog!')
-    note_dialog = NoteDialog(root)
-    root.wait_window(note_dialog.top)
+    if scope.has_concept_tags() is True:
+        note_dialog = NoteDialog(root)
+        root.wait_window(note_dialog.top)
+    else:
+        messagebox.showerror('Missing query tags', 'You should select query tags!')
 
 
 class Note(object):
@@ -299,9 +302,10 @@ class NoteDialog(object):
 
         dialog_frame = tkinter.Frame(top)
 
-        self.type_combobox = ttk.Combobox(dialog_frame)
-        self.type_combobox['values'] = ['URL', 'Wikipedia', 'YouTube', 'GitHub', 'FaceBook']
-        self.type_combobox.current(1)
+        url_types = ['URL', 'Wikipedia', 'YouTube', 'GitHub', 'FaceBook', 'Link']
+        self.url_type = StringVar()
+        self.url_type.set('URL')
+
         self.url_entry = tkinter.Entry(dialog_frame)
         self.comment_entry = tkinter.Entry(dialog_frame)
         self.save_button = tkinter.Button(dialog_frame, text='Save', command=self.save_note)
@@ -311,24 +315,26 @@ class NoteDialog(object):
 
         dialog_frame.grid(row=0, column=0, sticky=full)
 
-        self.type_combobox.grid(row=0, column=0, columnspan=2, sticky=full)
-        self.url_entry.grid(row=1, column=0, columnspan=2, sticky=full)
-        self.comment_entry.grid(row=2, column=0, columnspan=2, sticky=full)
-        self.save_button.grid(row=3, column=1, sticky=full)
-        self.cancel_button.grid(row=3, column=0, sticky=full)
+        for index, name in enumerate(url_types):
+            radio_button = tkinter.Radiobutton(dialog_frame, text=name, value=name, variable=self.url_type, indicatoron=0)
+            radio_button.grid(row=0, column=index, sticky=full)
+
+        self.url_entry.grid(row=1, column=0, columnspan=6, sticky=full)
+        self.comment_entry.grid(row=2, column=0, columnspan=6, sticky=full)
+        self.cancel_button.grid(row=3, column=0, columnspan=3, sticky=full)
+        self.save_button.grid(row=3, column=3, columnspan=3, sticky=full)
 
         top.rowconfigure(0, weight=1)
         top.columnconfigure(0, weight=1)
 
-        dialog_frame.rowconfigure(0, weight=1)
-        dialog_frame.rowconfigure(1, weight=1)
-        dialog_frame.rowconfigure(2, weight=1)
-        dialog_frame.rowconfigure(3, weight=1)
-        dialog_frame.columnconfigure(0, weight=1)
-        dialog_frame.columnconfigure(1, weight=1)
+        for row_index in range(4):
+            dialog_frame.rowconfigure(row_index, weight=1)
+
+        for column_index in range(6):
+            dialog_frame.columnconfigure(column_index, weight=1)
 
     def save_note(self):
-        type = self.type_combobox.get()
+        type = self.url_type.get()
         url = self.url_entry.get()
         comment = self.comment_entry.get()
         note = Note(type, url, comment)

@@ -287,6 +287,15 @@ class Scope(object):
         """
         return self._concept_tag_ids
 
+    def has_concept_tags(self):
+        """
+        Check that there is at least one concept tag.
+        :return: True, when there is a concept tag, else False
+        """
+        if len(self._concept_tag_ids) > 0:
+            return True
+        return False
+
     def get_selection_tags(self):
         """
         Get the tags of the selected documents.
