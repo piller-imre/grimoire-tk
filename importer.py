@@ -33,7 +33,7 @@ def open_path(file_path):
             _ = subprocess.Popen(['evince', absolute_path])
         elif t in ['png', 'jpg', 'jpeg', 'bmp']:
             _ = subprocess.Popen(['viewnior', absolute_path])
-        elif t in ['py', 'h', 'c', 'cpp', 'txt', 'html', 'js', 'css']:
+        elif t in ['py', 'h', 'c', 'cpp', 'txt', 'html', 'js', 'css', 'rst', 'md']:
             _ = subprocess.Popen(['gedit', absolute_path])
         elif t in ['doc', 'docx', 'ppt', 'pptx']:
             _ = subprocess.Popen(['libreoffice', absolute_path])

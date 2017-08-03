@@ -217,7 +217,7 @@ class Scope(object):
             if tag_id not in self._concept_tag_ids:
                 self._concept_tag_ids.append(tag_id)
             else:
-                raise ValueError('The tag has already added to the concept!')
+                raise ValueError('The tag ({}) has already added to the concept!'.format(tag_id))
 
     def remove_tag(self, tag_id):
         """
@@ -315,4 +315,6 @@ class Scope(object):
         :param tag_name_input: the content of actual text input
         :return: the list of tag names as strings
         """
-        return [tag_name_input]
+        if tag_name_input != '':
+            return [tag_name_input]
+        return []
