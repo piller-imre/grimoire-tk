@@ -2,6 +2,7 @@
 Manage the log file
 """
 
+from datetime import datetime
 import json
 import os.path
 
@@ -19,6 +20,7 @@ class Logger(object):
 
     def save_operation(self, operation):
         """Save the operation to the log file."""
+        operation['timestamp'] = str(datetime.now())
         line = json.dumps(operation)
         if self._need_write_to_log:
             with open(self._path, 'a') as log_file:
@@ -30,6 +32,7 @@ class Logger(object):
         with open(self._path, 'r') as log_file:
             for line in log_file:
                 operation = json.loads(line)
+                operation.pop('timestamp', None)
                 method = operation.pop("method")
                 getattr(context, method)(**operation)
 

@@ -390,4 +390,7 @@ list_untracked_files()
 list_current_documents()
 list_current_tags()
 
+style = ttk.Style()
+style.theme_use('clam')
+
 root.mainloop()
