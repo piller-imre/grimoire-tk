@@ -340,6 +340,14 @@ class NoteDialog(object):
         self.top.destroy()
 
 
+def go_home():
+    """Remove all selections and tags."""
+    scope.deselect_all_documents()
+    scope.remove_all_tags()
+    list_current_tags()
+    list_current_documents()
+
+
 root = tkinter.Tk()
 root.title('Grimoire - Importer')
 
@@ -366,12 +374,14 @@ file_view.bind('<Button-3>', open_file)
 toolbar = tkinter.Frame(root)
 
 ordering_combobox = ttk.Combobox(toolbar)
+home_button = tkinter.Button(toolbar, text='Home', command=go_home)
 note_button = tkinter.Button(toolbar, text='Note', command=show_note_dialog)
 
 full = (tkinter.N, tkinter.S, tkinter.E, tkinter.W)
 
-note_button.grid(row=0, column=0, sticky=full)
-ordering_combobox.grid(row=0, column=1, sticky=full)
+home_button.grid(row=0, column=0, sticky=full)
+note_button.grid(row=0, column=1, sticky=full)
+ordering_combobox.grid(row=0, column=2, sticky=full)
 
 tag_entry.grid(row=0, column=0, sticky=full)
 toolbar.grid(row=0, column=1, sticky=full)

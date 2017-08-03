@@ -239,6 +239,13 @@ class Scope(object):
             else:
                 raise ValueError('The tag identifier does not in the scope!')
 
+    def remove_all_tags(self):
+        """
+        Remove all tags from the query.
+        :return: None
+        """
+        self._concept_tag_ids = []
+
     def destroy_tag(self, tag_id):
         """
         Destroy the tag of the managed context.
