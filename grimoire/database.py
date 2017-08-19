@@ -100,6 +100,22 @@ class Database(Context):
         super(Database, self).destroy_tag(**arguments)
         self.save_operation('destroy_tag', **arguments)
 
+    def find_similar_tags(self, tag_name, limit=20):
+        """
+        Find tags with a similar name.
+        :param tag_name: the searched tag name
+        :param limit: the maximal number of the resulted tag names
+        :return: the list of tag names
+        """
+        name = tag_name.lower()
+        similar_tags = []
+        for _, tag in self._tags.items():
+            if name in tag.name.lower():
+                similar_tags.append(tag.name)
+                if len(similar_tags) == limit:
+                    return similar_tags
+        return similar_tags
+
     def create_relation(self, **arguments):
         """
         Create a new relation.
